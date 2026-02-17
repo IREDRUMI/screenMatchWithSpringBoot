@@ -1,0 +1,89 @@
+package com.aluracursos.screenmatch.model;
+
+import java.util.OptionalDouble;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+
+public class Serie {
+        String titulo;
+        Integer totalTemporadas;
+        Double evaluacion;
+        Categoria genero;
+        String actores;
+        String poster;
+        String sinopsis;
+
+     public Serie (DatosSerie datosSerie){
+        this.titulo = datosSerie.titulo();
+        this.totalTemporadas = datosSerie.totalTemporadas();
+        this.evaluacion = OptionalDouble.of(Double.valueOf(datosSerie.evaluacion())).orElse(0);
+        this.poster = datosSerie.poster();
+        this.genero = Categoria.fromString (datosSerie.genero().split(",")[0].trim());
+        this.actores = datosSerie.sinopsis();
+        this.sinopsis = datosSerie.sinopsis();
+     }
+
+     public String getTitulo() {
+         return titulo;
+     }
+
+     public void setTitulo(String titulo) {
+         this.titulo = titulo;
+     }
+
+     public Integer getTotalTemporadas() {
+         return totalTemporadas;
+     }
+
+     public void setTotalTemporadas(Integer totalTemporadas) {
+         this.totalTemporadas = totalTemporadas;
+     }
+
+     public Double getEvaluacion() {
+         return evaluacion;
+     }
+
+     public void setEvaluacion(Double evaluacion) {
+         this.evaluacion = evaluacion;
+     }
+
+     public Categoria getGenero() {
+         return genero;
+     }
+
+     public void setGenero(Categoria genero) {
+         this.genero = genero;
+     }
+
+     public String getActores() {
+         return actores;
+     }
+
+     public void setActores(String actores) {
+         this.actores = actores;
+     }
+
+     public String getPoster() {
+         return poster;
+     }
+
+     public void setPoster(String poster) {
+         this.poster = poster;
+     }
+
+     public String getSinopsis() {
+         return sinopsis;
+     }
+
+     public void setSinopsis(String sinopsis) {
+         this.sinopsis = sinopsis;
+     }
+
+     @Override
+     public String toString() {
+        return "titulo=" + titulo + ", totalTemporadas=" + totalTemporadas + ", evaluacion=" + evaluacion
+                + ", genero=" + genero + ", actores=" + actores + ", poster=" + poster + ", sinopsis=" + sinopsis;
+     }
+
+     
+}

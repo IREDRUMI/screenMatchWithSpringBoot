@@ -19,23 +19,76 @@ public class Principal {
     private final String URL_BASE = "https://www.omdbapi.com/?t=";
     private final String API_KEY = "&apikey=4fc7c187";
     private ConvierteDatos conversor = new ConvierteDatos();
+    private List<DatosSerie> datosSerie = new ArrayList<>();
     public void muestraElMenu(){
+        var opcion = -1;
+                while(opcion != 0){
+                        var menu = """
+                                1 - Buscar Series
+                                2 - Buscar Episodios
+                                3 - Mostrar series buscadas
+                                0 - Salir
+                                        """;
+                        System.out.println(menu);
+                        opcion = teclado.nextInt();
+                        teclado.nextLine();
+
+                        switch (opcion) {
+                                case 1:
+                                        buscarSerieWeb();
+                                        break;
+                                case 2:
+                                        buscarEpisodiosPorSerie();
+                                        break;
+                                case 0:
+                                        System.out.println("Cerrando la aplicacion...");
+                                        break;
+                                case 3:
+                                        mostrarSeriesBuscadas();
+                                        break;                        
+                                default:
+                                        System.out.println("Opci�n invalida");
+                                        break;
+                        }
+
+                }
+    }
+    
+    private DatosSerie getDatosSerie(){
         System.out.println("Escribe el nombre de la série que deseas buscar");
-        //Busca los datos generales de las series
         var nombreSerie = teclado.nextLine();
         var json = consumoApi.obtenerDatos(URL_BASE + nombreSerie.replace(" ", "+") + API_KEY);
-        //https://www.omdbapi.com/?t=game+of+thrones&apikey=4fc7c187
+        System.out.println(URL_BASE + nombreSerie.replace(" ", "+") + API_KEY);
+        //System.out.println(json);
         DatosSerie datos = conversor.obtenerDatos(json, DatosSerie.class);
-        System.out.println(datos);
+        return datos;
+    }
 
-        //Busca los datos de todas las temporadas
+    //Busca los datos de todas las temporadas
+    private void buscarEpisodiosPorSerie(){
+        DatosSerie datosSerie = getDatosSerie();
         List<DatosTemporadas> temporadas = new ArrayList<>();
-        for (int i = 1; i <= datos.totalTemporadas(); i++) {
-            json = consumoApi.obtenerDatos(URL_BASE + nombreSerie.replace(" ", "+") + "&Season=" + i + API_KEY);
+        for (int i = 1; i <= datosSerie.totalTemporadas(); i++) {
+            var json = consumoApi.obtenerDatos(URL_BASE + datosSerie.titulo().replace(" ", "+") + "&Season=" + i + API_KEY);
             DatosTemporadas datosTemporada = conversor.obtenerDatos(json, DatosTemporadas.class);
             temporadas.add(datosTemporada);
         }
+        temporadas.forEach(System.out::println);
+    }
+
+    private void buscarSerieWeb(){
+        DatosSerie datos = getDatosSerie();
+        datosSerie.add(datos);
+        System.out.println(datos);
+    }
+
+    //Busca los datos generales de las series
+    private void mostrarSeriesBuscadas() {
+        datosSerie.forEach(System.out::println);
+        }
+
         //temporadas.forEach(System.out::println);
+
         
 
         //Mostrar solo el titulo de los episodios para las temporadas
@@ -49,9 +102,9 @@ public class Principal {
         // Mejoría usando funciones Lambda
         //temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
 
-        List<DatosEpisodio> datosEpisodios = temporadas.stream()
-                .flatMap(t -> t.episodios().stream())
-                .collect(Collectors.toList());
+        // List<DatosEpisodio> datosEpisodios = temporadas.stream()
+        //         .flatMap(t -> t.episodios().stream())
+        //         .collect(Collectors.toList());
 
         // Obtener los top 5 episodios
         // System.out.println("\n Top 5 episodios");
@@ -67,10 +120,10 @@ public class Principal {
         //         .forEach(System.out::println);
 
         //Convirtiendo los datos a una lista del tipo Episodio
-        List<Episodio> episodios = temporadas.stream()
-                .flatMap(t -> t.episodios().stream()
-                        .map(d -> new Episodio(t.numero(), d)))
-                .collect(Collectors.toList());
+        // List<Episodio> episodios = temporadas.stream()
+                // .flatMap(t -> t.episodios().stream()
+                //         .map(d -> new Episodio(t.numero(), d)))
+                // .collect(Collectors.toList());
 
         //episodios.forEach(System.out::println);
 
@@ -81,7 +134,7 @@ public class Principal {
 
         //LocalDate fechaBusqueda = LocalDate.of(fecha, 1, 1);
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         // episodios.stream()
         //         .filter(e -> e.getFechaDeLanzamiento() != null && e.getFechaDeLanzamiento().isAfter(fechaBusqueda))
         //         .forEach(e -> System.out.println(
@@ -103,17 +156,17 @@ public class Principal {
         //         System.out.println("Episodio no encontrado");
         // }
 
-        Map<Integer,Double> evaluacionesPorTemporada = episodios.stream()
-                .filter(e -> e.getEvaluacion() > 0.0)
-                .collect(Collectors.groupingBy(Episodio::getTemporada,
-                        Collectors.averagingDouble(Episodio::getEvaluacion)));
-        System.out.println(evaluacionesPorTemporada);
+        // Map<Integer,Double> evaluacionesPorTemporada = episodios.stream()
+        //         .filter(e -> e.getEvaluacion() > 0.0)
+        //         .collect(Collectors.groupingBy(Episodio::getTemporada,
+        //                 Collectors.averagingDouble(Episodio::getEvaluacion)));
+        // System.out.println(evaluacionesPorTemporada);
 
-        DoubleSummaryStatistics est = episodios.stream()
-                        .filter(e -> e.getEvaluacion() > 0.0)
-                        .collect(Collectors.summarizingDouble(Episodio::getEvaluacion));
-        System.out.println("La media de las evaluaciones: " + est.getAverage());
-        System.out.println("El episodio mejor evaluado: " + est.getMax());
-        System.out.println("Episodio peor evaluado: " + est.getmin());
-    }
+        // DoubleSummaryStatistics est = episodios.stream()
+        //                 .filter(e -> e.getEvaluacion() > 0.0)
+        //                 .collect(Collectors.summarizingDouble(Episodio::getEvaluacion));
+        // System.out.println("La media de las evaluaciones: " + est.getAverage());
+        // System.out.println("El episodio mejor evaluado: " + est.getMax());
+        // System.out.println("Episodio peor evaluado: " + est.getMin());
+//     }
 }
