@@ -1,9 +1,6 @@
 package com.aluracursos.screenmatch.principal;
 
-import com.aluracursos.screenmatch.model.DatosEpisodio;
-import com.aluracursos.screenmatch.model.DatosSerie;
-import com.aluracursos.screenmatch.model.DatosTemporadas;
-import com.aluracursos.screenmatch.model.Episodio;
+import com.aluracursos.screenmatch.model.*;
 import com.aluracursos.screenmatch.service.ConsumoAPI;
 import com.aluracursos.screenmatch.service.ConvierteDatos;
 
@@ -47,7 +44,7 @@ public class Principal {
                                         mostrarSeriesBuscadas();
                                         break;                        
                                 default:
-                                        System.out.println("Opción invalida");
+                                        System.out.println("Opciï¿½n invalida");
                                         break;
                         }
 
@@ -84,8 +81,15 @@ public class Principal {
 
     //Busca los datos generales de las series
     private void mostrarSeriesBuscadas() {
-        datosSerie.forEach(System.out::println);
+        List<Serie> series = new ArrayList<>();
+        series = datosSerie.stream()
+                .map(d -> new Serie(d))
+                .collect(Collectors.toList());
+        series.stream()
+                .sorted(Comparator.comparing(Serie::getGenero))
+                .forEach(System.out::println);
         }
+
 
         //temporadas.forEach(System.out::println);
 
@@ -114,7 +118,7 @@ public class Principal {
         //         .sorted(Comparator.comparing(DatosEpisodio::evaluacion).reversed())
         //         .peek(e -> System.out.println("Segunda ordenacion (M>m)" + e))
         //         .map(e -> e.titulo().toUpperCase())
-        //         .peek(e -> System.out.println("Tercer filtro mayúscula (m>M)" + e))
+        //         .peek(e -> System.out.println("Tercer filtro mayï¿½scula (m>M)" + e))
         //         .limit(5)
 
         //         .forEach(System.out::println);

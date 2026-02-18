@@ -2,6 +2,7 @@ package com.aluracursos.screenmatch.model;
 
 import java.util.OptionalDouble;
 
+import com.aluracursos.screenmatch.service.ConsultaChatGPT;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class Serie {
@@ -18,9 +19,9 @@ public class Serie {
         this.totalTemporadas = datosSerie.totalTemporadas();
         this.evaluacion = OptionalDouble.of(Double.valueOf(datosSerie.evaluacion())).orElse(0);
         this.poster = datosSerie.poster();
-        this.genero = Categoria.fromString (datosSerie.genero().split(",")[0].trim());
-        this.actores = datosSerie.sinopsis();
-        this.sinopsis = datosSerie.sinopsis();
+        this.genero = Categoria.fromString(datosSerie.genero().split(",")[0].trim());
+        this.actores = datosSerie.actores();
+        this.sinopsis = ConsultaChatGPT.obtenerTraduccion(datosSerie.sinopsis());
      }
 
      public String getTitulo() {
@@ -81,9 +82,11 @@ public class Serie {
 
      @Override
      public String toString() {
-        return "titulo=" + titulo + ", totalTemporadas=" + totalTemporadas + ", evaluacion=" + evaluacion
-                + ", genero=" + genero + ", actores=" + actores + ", poster=" + poster + ", sinopsis=" + sinopsis;
+        return "genero=" + genero + ", titulo=" + titulo + ", totalTemporadas=" + totalTemporadas + ", evaluacion=" + evaluacion
+                + ", actores=" + actores + ", poster=" + poster + ", sinopsis=" + sinopsis;
      }
+
+
 
      
 }
